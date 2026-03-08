@@ -250,27 +250,32 @@ export default function ContentArea() {
                   </button>
                 </div>
 
-                {/* Presentation Controls (Only in Fullscreen) */}
-                {isFullscreen && numPages && (
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 bg-black/60 backdrop-blur-xl rounded-full border border-white/10 shadow-2xl">
+                {/* Presentation Controls */}
+                {numPages && (
+                  <div className={cn(
+                    "absolute z-50 flex items-center gap-4 bg-black/60 backdrop-blur-xl rounded-full border border-white/10 shadow-2xl transition-all duration-300",
+                    isFullscreen 
+                      ? "bottom-8 left-1/2 -translate-x-1/2 px-6 py-3" 
+                      : "bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 opacity-0 group-hover:opacity-100"
+                  )}>
                     <button 
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className="p-2 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
-                      <ChevronLeft size={24} />
+                      <ChevronLeft size={isFullscreen ? 24 : 18} />
                     </button>
-                    <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                      <span className="text-sm font-bold text-white">{currentPage}</span>
-                      <span className="text-xs font-medium text-zinc-500">/</span>
-                      <span className="text-sm font-bold text-zinc-400">{numPages}</span>
+                    <div className="flex items-center gap-2 min-w-[60px] justify-center">
+                      <span className={cn("font-bold text-white", isFullscreen ? "text-sm" : "text-xs")}>{currentPage}</span>
+                      <span className="text-[10px] font-medium text-zinc-500">/</span>
+                      <span className={cn("font-bold text-zinc-400", isFullscreen ? "text-sm" : "text-xs")}>{numPages}</span>
                     </div>
                     <button 
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, numPages))}
                       disabled={currentPage === numPages}
                       className="p-2 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
-                      <ChevronRight size={24} />
+                      <ChevronRight size={isFullscreen ? 24 : 18} />
                     </button>
                   </div>
                 )}
@@ -324,9 +329,32 @@ export default function ContentArea() {
                 </div>
               </div>
 
+              <div className="mt-3 flex items-center justify-between px-1">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Current Page:</span>
+                    <span className="text-xs font-bold text-zinc-200">{currentPage} <span className="text-zinc-600 mx-0.5">/</span> {numPages || '--'}</span>
+                  </div>
+                </div>
+                
+                {numPages && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-orange-500 transition-all duration-300" 
+                        style={{ width: `${(currentPage / numPages) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                      {Math.round((currentPage / numPages) * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <div className="mt-4 bg-zinc-900/80 border border-zinc-800 rounded-lg px-4 py-2 flex items-center justify-between">
                 <p className="text-[10px] text-zinc-500 italic flex items-center gap-1">
-                  <Maximize2 size={10} /> Tip: Use the native PDF controls to zoom and navigate. Press ESC to exit fullscreen.
+                  <Maximize2 size={10} /> Tip: Use Arrow keys or Spacebar to navigate in presentation mode.
                 </p>
               </div>
             </section>
