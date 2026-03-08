@@ -29,22 +29,26 @@ interface SidebarItemProps {
 
 const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle }: SidebarItemProps) => {
   return (
-    <div className="mb-1">
+    <div className="mb-2">
       <button
         onClick={onToggle}
         className={cn(
-          "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
-          active ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+          "w-full flex items-center justify-between px-4 py-3 rounded-md transition-all duration-200",
+          active ? "bg-zinc-800/50 text-white" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/30"
         )}
       >
-        <div className="flex items-center gap-3">
-          {icon && <span className="text-zinc-500">{icon}</span>}
-          <span className="font-medium">{label}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-zinc-600">
+            {icon || <ChevronRight size={14} strokeWidth={3} />}
+          </span>
+          <span className="text-[15px] font-bold tracking-tight">{label}</span>
         </div>
         <div className="flex items-center gap-2">
-          {count && <span className="text-[10px] bg-zinc-700 px-1.5 py-0.5 rounded text-zinc-300">{count}</span>}
+          {count && <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-400 font-bold">{count}</span>}
           {subItems && (
-            isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />
+            <span className="text-zinc-600">
+              {isOpen ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronRight size={14} strokeWidth={3} />}
+            </span>
           )}
         </div>
       </button>
@@ -102,7 +106,7 @@ export default function Sidebar() {
         <div className="flex items-center px-2 text-[10px] text-zinc-500 font-mono">81/435</div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-2 custom-scrollbar py-2">
         <SidebarItem 
           label="Sorting" 
           isOpen={openSections['Sorting']}
@@ -115,15 +119,15 @@ export default function Sidebar() {
             { label: 'Quick Sorting', completed: false },
           ]}
         />
-        <SidebarItem label="Arrays" icon={<LayoutGrid size={16} />} />
-        <SidebarItem label="Hashing" icon={<LayoutGrid size={16} />} />
-        <SidebarItem label="Binary Search" icon={<Search size={16} />} />
-        <SidebarItem label="Recursion" icon={<ChevronRight size={16} />} />
-        <SidebarItem label="Linked-List" icon={<ChevronRight size={16} />} />
-        <SidebarItem label="Bit Manipulation" icon={<ChevronRight size={16} />} />
-        <SidebarItem label="Greedy Algorithms" icon={<ChevronRight size={16} />} />
-        <SidebarItem label="Sliding Window" icon={<ChevronRight size={16} />} />
-        <SidebarItem label="Stack / Queues" icon={<ChevronRight size={16} />} />
+        <SidebarItem label="Arrays" />
+        <SidebarItem label="Hashing" />
+        <SidebarItem label="Binary Search" />
+        <SidebarItem label="Recursion" />
+        <SidebarItem label="Linked-List" />
+        <SidebarItem label="Bit Manipulation" />
+        <SidebarItem label="Greedy Algorithms" />
+        <SidebarItem label="Sliding Window" />
+        <SidebarItem label="Stack / Queues" />
       </div>
 
       <div className="p-4 border-t border-zinc-800 space-y-2">
