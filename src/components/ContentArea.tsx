@@ -16,6 +16,7 @@ import {
   AlertCircle,
   X
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -333,21 +334,58 @@ export default function ContentArea() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Current Page:</span>
-                    <span className="text-xs font-bold text-zinc-200">{currentPage} <span className="text-zinc-600 mx-0.5">/</span> {numPages || '--'}</span>
+                    <div className="flex items-center gap-1">
+                      <AnimatePresence mode="wait">
+                        <motion.span 
+                          key={currentPage}
+                          initial={{ y: 5, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -5, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-xs font-bold text-zinc-200"
+                        >
+                          {currentPage}
+                        </motion.span>
+                      </AnimatePresence>
+                      <span className="text-zinc-600 mx-0.5 text-xs">/</span> 
+                      <span className="text-xs font-bold text-zinc-200">{numPages || '--'}</span>
+                    </div>
                   </div>
                 </div>
                 
                 {numPages && (
                   <div className="flex items-center gap-2">
-                    <div className="w-32 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-orange-500 transition-all duration-300" 
-                        style={{ width: `${(currentPage / numPages) * 100}%` }}
-                      ></div>
+                    <div className="w-32 h-1 bg-zinc-800 rounded-full overflow-hidden relative">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(currentPage / numPages) * 100}%` }}
+                        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.4)]"
+                      />
+                      {/* Subtle animated shine effect */}
+                      <motion.div 
+                        animate={{ 
+                          left: ["-100%", "200%"] 
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity, 
+                          ease: "linear",
+                          repeatDelay: 1
+                        }}
+                        className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                      />
                     </div>
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                      {Math.round((currentPage / numPages) * 100)}%
-                    </span>
+                    <AnimatePresence mode="wait">
+                      <motion.span 
+                        key={currentPage}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[32px] text-right"
+                      >
+                        {Math.round((currentPage / numPages) * 100)}%
+                      </motion.span>
+                    </AnimatePresence>
                   </div>
                 )}
               </div>
