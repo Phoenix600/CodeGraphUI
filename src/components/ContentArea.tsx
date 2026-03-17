@@ -89,7 +89,7 @@ export default function ContentArea() {
 
     observer.observe(pdfContainerRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [activeTab]);
 
   // Fetch and Cache PDF
   React.useEffect(() => {
@@ -467,7 +467,7 @@ export default function ContentArea() {
                       >
                         <Page 
                           pageNumber={currentPage} 
-                          width={isFullscreen ? undefined : containerWidth - 40}
+                          width={isFullscreen ? undefined : (containerWidth > 40 ? containerWidth - 40 : 400)}
                           height={isFullscreen ? window.innerHeight - 120 : undefined}
                           renderTextLayer={false}
                           renderAnnotationLayer={false}
