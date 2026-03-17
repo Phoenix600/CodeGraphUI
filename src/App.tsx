@@ -1,17 +1,43 @@
 import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
 import EditorArea from './components/EditorArea';
-import { Trophy } from 'lucide-react';
+import { Trophy, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import React from 'react';
 
 export default function App() {
+  const [isSidebarVisible, setIsSidebarVisible] = React.useState(true);
+
+  React.useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setIsSidebarVisible(false);
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault();
+        setIsSidebarVisible(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div className="flex h-screen bg-[#0A0A0A] text-zinc-300 font-sans overflow-hidden">
-      <Sidebar />
+      <Sidebar isVisible={isSidebarVisible} onToggle={() => setIsSidebarVisible(!isSidebarVisible)} />
       
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
         <header className="h-12 border-b border-zinc-800 flex items-center justify-between px-6 bg-[#0A0A0A] shrink-0">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+              className="p-1.5 text-zinc-500 hover:text-zinc-200 transition-colors rounded-md hover:bg-zinc-800"
+              title={isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+            >
+              {isSidebarVisible ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+            </button>
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Progress</span>
               <div className="w-48 h-1.5 bg-zinc-800 rounded-full overflow-hidden">

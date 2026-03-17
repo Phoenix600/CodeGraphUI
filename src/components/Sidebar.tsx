@@ -26,9 +26,10 @@ interface SidebarItemProps {
   subItems?: { label: string; completed?: boolean; active?: boolean }[];
   isOpen?: boolean;
   onToggle?: () => void;
+  onItemClick?: () => void;
 }
 
-const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle }: SidebarItemProps) => {
+const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle, onItemClick }: SidebarItemProps) => {
   return (
     <div className="mb-2">
       <button
@@ -66,6 +67,7 @@ const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle }:
               {subItems.map((item, idx) => (
                 <button
                   key={idx}
+                  onClick={onItemClick}
                   className={cn(
                     "w-full flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors",
                     item.active ? "text-orange-500 bg-orange-500/10" : "text-zinc-500 hover:text-zinc-300"
@@ -89,7 +91,12 @@ const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle }:
   );
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  isVisible: boolean;
+  onToggle: () => void;
+}
+
+export default function Sidebar({ isVisible, onToggle }: SidebarProps) {
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({ 'Sorting': true });
 
   const toggleSection = (label: string) => {
@@ -97,8 +104,17 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#0A0A0A] border-r border-zinc-800 flex flex-col h-screen sticky top-0">
-      <div className="p-4 flex items-center gap-2">
+    <AnimatePresence mode="wait">
+      {isVisible && (
+        <motion.aside 
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 256, opacity: 1 }}
+          exit={{ width: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="bg-[#0A0A0A] border-r border-zinc-800 flex flex-col h-screen sticky top-0 overflow-hidden whitespace-nowrap"
+        >
+          <div className="w-64 flex flex-col h-full">
+            <div className="p-4 flex items-center gap-2">
         <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center text-white font-bold italic">F</div>
         <div className="relative flex-1">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
@@ -121,6 +137,7 @@ export default function Sidebar() {
           label="Sorting" 
           isOpen={openSections['Sorting']}
           onToggle={() => toggleSection('Sorting')}
+          onItemClick={onToggle}
           subItems={[
             { label: 'Selection Sort', completed: true },
             { label: 'Bubble Sort', completed: true, active: true },
@@ -129,15 +146,15 @@ export default function Sidebar() {
             { label: 'Quick Sorting', completed: false },
           ]}
         />
-        <SidebarItem label="Arrays" />
-        <SidebarItem label="Hashing" />
-        <SidebarItem label="Binary Search" />
-        <SidebarItem label="Recursion" />
-        <SidebarItem label="Linked-List" />
-        <SidebarItem label="Bit Manipulation" />
-        <SidebarItem label="Greedy Algorithms" />
-        <SidebarItem label="Sliding Window" />
-        <SidebarItem label="Stack / Queues" />
+        <SidebarItem label="Arrays" onItemClick={onToggle} />
+        <SidebarItem label="Hashing" onItemClick={onToggle} />
+        <SidebarItem label="Binary Search" onItemClick={onToggle} />
+        <SidebarItem label="Recursion" onItemClick={onToggle} />
+        <SidebarItem label="Linked-List" onItemClick={onToggle} />
+        <SidebarItem label="Bit Manipulation" onItemClick={onToggle} />
+        <SidebarItem label="Greedy Algorithms" onItemClick={onToggle} />
+        <SidebarItem label="Sliding Window" onItemClick={onToggle} />
+        <SidebarItem label="Stack / Queues" onItemClick={onToggle} />
       </div>
 
       <div className="p-4 border-t border-zinc-800 space-y-2">
@@ -155,6 +172,9 @@ export default function Sidebar() {
           <ChevronRight size={14} className="text-zinc-600" />
         </div>
       </div>
-    </aside>
-  );
+    </div>
+  </motion.aside>
+)}
+</AnimatePresence>
+);
 }
