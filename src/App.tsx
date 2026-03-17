@@ -2,12 +2,16 @@ import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
 import EditorArea from './components/EditorArea';
 import ProfileView from './components/ProfileView';
+import ProfileDashboard from './components/ProfileDashboard';
 import { Trophy, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import React from 'react';
 
+import { DUMMY_USER } from './constants';
+
 export default function App() {
   const [isSidebarVisible, setIsSidebarVisible] = React.useState(true);
-  const [currentView, setCurrentView] = React.useState<'main' | 'profile'>('main');
+  const [currentView, setCurrentView] = React.useState<'main' | 'profile' | 'profile-dashboard'>('main');
+  const [userProfile, setUserProfile] = React.useState(DUMMY_USER);
 
   React.useEffect(() => {
     if (window.innerWidth < 1024) {
@@ -25,8 +29,27 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  if (currentView === 'profile-dashboard') {
+    return (
+      <ProfileDashboard 
+        user={userProfile}
+        onBack={() => setCurrentView('main')} 
+        onEdit={() => setCurrentView('profile')} 
+      />
+    );
+  }
+
   if (currentView === 'profile') {
-    return <ProfileView onBack={() => setCurrentView('main')} />;
+    return (
+      <ProfileView 
+        user={userProfile}
+        onSave={(updatedUser) => {
+          setUserProfile(updatedUser);
+          setCurrentView('profile-dashboard');
+        }}
+        onBack={() => setCurrentView('profile-dashboard')} 
+      />
+    );
   }
 
   return (
@@ -34,7 +57,7 @@ export default function App() {
       <Sidebar 
         isVisible={isSidebarVisible} 
         onToggle={() => setIsSidebarVisible(!isSidebarVisible)} 
-        onProfileClick={() => setCurrentView('profile')}
+        onProfileClick={() => setCurrentView('profile-dashboard')}
       />
       
       <main className="flex-1 flex flex-col min-w-0">
@@ -59,7 +82,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-xs font-bold text-orange-500">
               <Trophy size={16} />
-              Day 328/45
+              Day {DUMMY_USER.streak}/45
             </div>
             <div className="flex items-center gap-3">
               <button className="p-1.5 text-zinc-500 hover:text-zinc-200 transition-colors">

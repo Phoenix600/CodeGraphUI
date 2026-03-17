@@ -18,6 +18,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
+import { DUMMY_USER } from '../constants';
+
 interface SidebarItemProps {
   icon?: React.ReactNode;
   label: string;
@@ -172,11 +174,16 @@ export default function Sidebar({ isVisible, onToggle, onProfileClick }: Sidebar
           onClick={onProfileClick}
           className="flex items-center gap-3 px-3 py-2 mt-2 cursor-pointer hover:bg-zinc-800/50 rounded-lg transition-colors group"
         >
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-zinc-200 transition-colors">
-            <User size={16} />
+          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-zinc-200 transition-colors overflow-hidden">
+            <img 
+              src={DUMMY_USER.avatarUrl} 
+              alt="avatar" 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-zinc-200 truncate">Rohan Satam</p>
+            <p className="text-xs font-medium text-zinc-200 truncate">{DUMMY_USER.name}</p>
           </div>
           <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
         </div>
