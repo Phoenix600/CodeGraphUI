@@ -94,9 +94,10 @@ const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle, o
 interface SidebarProps {
   isVisible: boolean;
   onToggle: () => void;
+  onProfileClick?: () => void;
 }
 
-export default function Sidebar({ isVisible, onToggle }: SidebarProps) {
+export default function Sidebar({ isVisible, onToggle, onProfileClick }: SidebarProps) {
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({ 'Sorting': true });
 
   const toggleSection = (label: string) => {
@@ -114,17 +115,22 @@ export default function Sidebar({ isVisible, onToggle }: SidebarProps) {
           className="bg-[#0A0A0A] border-r border-zinc-800 flex flex-col h-screen sticky top-0 overflow-hidden whitespace-nowrap"
         >
           <div className="w-64 flex flex-col h-full">
-            <div className="p-4 flex items-center gap-2">
-        <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center text-white font-bold italic">F</div>
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-md py-1.5 pl-8 pr-3 text-xs text-zinc-300 focus:outline-none focus:border-zinc-700"
-          />
-        </div>
-      </div>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-orange-600 rounded flex items-center justify-center text-white shadow-lg shadow-orange-900/20">
+                  <Code2 size={18} strokeWidth={2.5} />
+                </div>
+                <span className="font-bold text-lg tracking-tight text-zinc-100">Code Graph</span>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
+                <input 
+                  type="text" 
+                  placeholder="Search chapters..." 
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-md py-1.5 pl-8 pr-3 text-xs text-zinc-300 focus:outline-none focus:border-zinc-700 transition-colors"
+                />
+              </div>
+            </div>
 
       <div className="flex gap-1 px-4 mb-4">
         <button className="flex-1 py-1 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 rounded">Basic</button>
@@ -162,14 +168,17 @@ export default function Sidebar({ isVisible, onToggle }: SidebarProps) {
           <Trophy size={16} />
           <span>Track</span>
         </button>
-        <div className="flex items-center gap-3 px-3 py-2 mt-2">
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+        <div 
+          onClick={onProfileClick}
+          className="flex items-center gap-3 px-3 py-2 mt-2 cursor-pointer hover:bg-zinc-800/50 rounded-lg transition-colors group"
+        >
+          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-zinc-200 transition-colors">
             <User size={16} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-zinc-200 truncate">Pranay Ashok Ramteke</p>
+            <p className="text-xs font-medium text-zinc-200 truncate">Rohan Satam</p>
           </div>
-          <ChevronRight size={14} className="text-zinc-600" />
+          <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 {
-  "name": "TUF+ Coding Platform Clone",
-  "description": "A high-fidelity demo of a modern coding learning platform with sidebar navigation, editorial content, and a code editor interface.",
+  "name": "Code Graph",
+  "description": "A modern coding learning platform with interactive chapters, editorial content, and a built-in code editor.",
   "requestFramePermissions": []
 }

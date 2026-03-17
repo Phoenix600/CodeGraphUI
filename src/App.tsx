@@ -1,11 +1,13 @@
 import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
 import EditorArea from './components/EditorArea';
+import ProfileView from './components/ProfileView';
 import { Trophy, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import React from 'react';
 
 export default function App() {
   const [isSidebarVisible, setIsSidebarVisible] = React.useState(true);
+  const [currentView, setCurrentView] = React.useState<'main' | 'profile'>('main');
 
   React.useEffect(() => {
     if (window.innerWidth < 1024) {
@@ -23,9 +25,17 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  if (currentView === 'profile') {
+    return <ProfileView onBack={() => setCurrentView('main')} />;
+  }
+
   return (
     <div className="flex h-screen bg-[#0A0A0A] text-zinc-300 font-sans overflow-hidden">
-      <Sidebar isVisible={isSidebarVisible} onToggle={() => setIsSidebarVisible(!isSidebarVisible)} />
+      <Sidebar 
+        isVisible={isSidebarVisible} 
+        onToggle={() => setIsSidebarVisible(!isSidebarVisible)} 
+        onProfileClick={() => setCurrentView('profile')}
+      />
       
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
