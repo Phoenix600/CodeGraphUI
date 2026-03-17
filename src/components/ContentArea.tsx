@@ -21,7 +21,8 @@ import {
   Expand,
   Clock,
   Database,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -40,6 +41,13 @@ export default function ContentArea() {
   const [editorFontSize, setEditorFontSize] = React.useState(12);
   const [isZenMode, setIsZenMode] = React.useState(false);
   const [selectedSubmission, setSelectedSubmission] = React.useState<any | null>(null);
+  const [submissions, setSubmissions] = React.useState([
+    { id: 1, status: 'Accepted', runtime: '2ms', memory: '42.5MB', date: 'Mar 17, 2026', language: 'Java', runtimePercent: '98.5%', memoryPercent: '82.1%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+    { id: 2, status: 'Wrong Answer', runtime: 'N/A', memory: 'N/A', date: 'Mar 16, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return 0;\n    }\n}' },
+    { id: 3, status: 'Accepted', runtime: '3ms', memory: '43.1MB', date: 'Mar 15, 2026', language: 'Java', runtimePercent: '92.3%', memoryPercent: '75.4%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+    { id: 4, status: 'Time Limit Exceeded', runtime: 'N/A', memory: 'N/A', date: 'Mar 14, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        while(true);\n    }\n}' },
+    { id: 5, status: 'Accepted', runtime: '5ms', memory: '44.2MB', date: 'Mar 12, 2026', language: 'Java', runtimePercent: '85.1%', memoryPercent: '68.2%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+  ]);
   const [pdfUrl, setPdfUrl] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -159,16 +167,27 @@ export default function ContentArea() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen, numPages]);
 
-  // Handle Zen Mode ESC key
+  // Handle ESC key for various modes
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isZenMode) {
-        setIsZenMode(false);
+      if (e.key === 'Escape') {
+        // If in fullscreen or zen mode, handle those first
+        if (isFullscreen) return; // Fullscreen has its own ESC handler
+        
+        if (isZenMode) {
+          setIsZenMode(false);
+        } else if (selectedSubmission) {
+          setSelectedSubmission(null);
+        } else if (activeTab === 'Submission') {
+          setActiveTab('Editorial');
+        } else if (activeTab === 'Editorial') {
+          setActiveTab('Description');
+        }
       }
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [isZenMode]);
+  }, [isZenMode, selectedSubmission, activeTab, isFullscreen]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -178,6 +197,11 @@ export default function ContentArea() {
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  const handleDeleteSubmission = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setSubmissions(prev => prev.filter(sub => sub.id !== id));
   };
 
   return (
@@ -644,25 +668,19 @@ export default function ContentArea() {
                 <h2 className="text-lg font-bold text-zinc-100">Past Submissions</h2>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
                   <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                  3 Accepted
+                  {submissions.filter(s => s.status === 'Accepted').length} Accepted
                 </div>
               </div>
               
               <div className="space-y-3">
-                {[
-                  { id: 1, status: 'Accepted', runtime: '2ms', memory: '42.5MB', date: 'Mar 17, 2026', language: 'Java', runtimePercent: '98.5%', memoryPercent: '82.1%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
-                  { id: 2, status: 'Wrong Answer', runtime: 'N/A', memory: 'N/A', date: 'Mar 16, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return 0;\n    }\n}' },
-                  { id: 3, status: 'Accepted', runtime: '3ms', memory: '43.1MB', date: 'Mar 15, 2026', language: 'Java', runtimePercent: '92.3%', memoryPercent: '75.4%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
-                  { id: 4, status: 'Time Limit Exceeded', runtime: 'N/A', memory: 'N/A', date: 'Mar 14, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        while(true);\n    }\n}' },
-                  { id: 5, status: 'Accepted', runtime: '5ms', memory: '44.2MB', date: 'Mar 12, 2026', language: 'Java', runtimePercent: '85.1%', memoryPercent: '68.2%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
-                ].map((sub, idx) => (
+                {submissions.map((sub, idx) => (
                   <motion.div 
-                    key={idx}
+                    key={sub.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     onClick={() => setSelectedSubmission(sub)}
-                    className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 hover:border-zinc-700/50 hover:bg-zinc-900/50 transition-all cursor-pointer group"
+                    className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 hover:border-zinc-700/50 hover:bg-zinc-900/50 transition-all cursor-pointer group relative"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -682,7 +700,16 @@ export default function ContentArea() {
                           {sub.language}
                         </span>
                       </div>
-                      <span className="text-[10px] font-medium text-zinc-600 group-hover:text-zinc-400 transition-colors">{sub.date}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-medium text-zinc-600 group-hover:text-zinc-400 transition-colors">{sub.date}</span>
+                        <button
+                          onClick={(e) => handleDeleteSubmission(e, sub.id)}
+                          className="p-1.5 text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-md transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete Submission"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
 
                     {sub.status === 'Accepted' ? (
