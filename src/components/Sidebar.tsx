@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Circle
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
 interface SidebarItemProps {
@@ -38,43 +39,52 @@ const SidebarItem = ({ icon, label, active, count, subItems, isOpen, onToggle }:
         )}
       >
         <div className="flex items-center gap-4">
-          <span className="text-zinc-600">
+          <motion.span 
+            animate={{ rotate: isOpen ? 90 : 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="text-zinc-600 flex items-center justify-center"
+          >
             {icon || <ChevronRight size={14} strokeWidth={3} />}
-          </span>
+          </motion.span>
           <span className="text-[15px] font-bold tracking-tight">{label}</span>
         </div>
         <div className="flex items-center gap-2">
           {count && <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-zinc-400 font-bold">{count}</span>}
-          {subItems && (
-            <span className="text-zinc-600">
-              {isOpen ? <ChevronDown size={14} strokeWidth={3} /> : <ChevronRight size={14} strokeWidth={3} />}
-            </span>
-          )}
         </div>
       </button>
       
-      {subItems && isOpen && (
-        <div className="ml-9 mt-1 space-y-1">
-          {subItems.map((item, idx) => (
-            <button
-              key={idx}
-              className={cn(
-                "w-full flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors",
-                item.active ? "text-orange-500 bg-orange-500/10" : "text-zinc-500 hover:text-zinc-300"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                {item.completed ? (
-                  <CheckCircle2 size={12} className="text-orange-500" />
-                ) : (
-                  <Circle size={12} className="text-zinc-600" />
-                )}
-                <span>{item.label}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {subItems && isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="ml-9 mt-1 space-y-1 pb-2">
+              {subItems.map((item, idx) => (
+                <button
+                  key={idx}
+                  className={cn(
+                    "w-full flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors",
+                    item.active ? "text-orange-500 bg-orange-500/10" : "text-zinc-500 hover:text-zinc-300"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {item.completed ? (
+                      <CheckCircle2 size={12} className="text-orange-500" />
+                    ) : (
+                      <Circle size={12} className="text-zinc-600" />
+                    )}
+                    <span>{item.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -5,14 +5,22 @@ import {
   RotateCcw, 
   Copy, 
   Maximize2, 
+  Minimize2,
   ChevronDown,
   Settings2,
-  Terminal
+  Terminal,
+  Sun,
+  Moon,
+  Type,
+  Expand
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export default function EditorArea() {
-  const [language, setLanguage] = React.useState('java');
+  const [language] = React.useState('java');
+  const [editorTheme, setEditorTheme] = React.useState('vs-dark');
+  const [editorFontSize, setEditorFontSize] = React.useState(14);
+  const [isZenMode, setIsZenMode] = React.useState(false);
   const [code, setCode] = React.useState({
     java: `class Outer1 {
     int x1 = 10;
@@ -138,26 +146,55 @@ if __name__ == "__main__":
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
-      setCode(prev => ({ ...prev, [language]: value }));
+      setCode(prev => ({ ...prev, java: value }));
     }
   };
+
+  // Handle Zen Mode ESC key
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isZenMode) {
+        setIsZenMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isZenMode]);
 
   return (
     <div className="flex-1 flex flex-col h-screen bg-[#0F0F0F]">
       {/* Editor Header */}
       <div className="h-12 border-b border-zinc-800 flex items-center justify-between px-4 bg-[#141414]">
         <div className="flex items-center gap-2">
-          <select 
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-orange-500"
-          >
-            <option value="cpp">C++</option>
-            <option value="java">Java</option>
-            <option value="python">Python</option>
-          </select>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 border border-zinc-800 rounded text-xs font-bold text-orange-500">
+            <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+            Java
+          </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Font Size Controls */}
+          <div className="flex items-center bg-zinc-800/50 border border-zinc-800 rounded px-2 py-1 gap-2">
+            <Type size={12} className="text-zinc-500" />
+            <button 
+              onClick={() => setEditorFontSize(prev => Math.max(8, prev - 1))}
+              className="text-zinc-400 hover:text-zinc-200 text-xs font-bold px-1"
+            >-</button>
+            <span className="text-[10px] font-bold text-zinc-300 min-w-[20px] text-center">{editorFontSize}</span>
+            <button 
+              onClick={() => setEditorFontSize(prev => Math.min(32, prev + 1))}
+              className="text-zinc-400 hover:text-zinc-200 text-xs font-bold px-1"
+            >+</button>
+          </div>
+
+          {/* Theme Toggle */}
+          <button 
+            onClick={() => setEditorTheme(prev => prev === 'vs-dark' ? 'light' : 'vs-dark')}
+            className="p-1.5 text-zinc-500 hover:text-zinc-300 transition-colors"
+            title="Toggle Theme"
+          >
+            {editorTheme === 'vs-dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
           <button className="p-1.5 text-zinc-500 hover:text-zinc-300"><Copy size={16} /></button>
           <button className="p-1.5 text-zinc-500 hover:text-zinc-300"><RotateCcw size={16} /></button>
           <button className="flex items-center gap-2 px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded transition-colors">
@@ -171,22 +208,80 @@ if __name__ == "__main__":
         <Editor
           height="100%"
           language={language}
-          theme="vs-dark"
+          theme={editorTheme}
           value={code[language as keyof typeof code]}
           onChange={handleEditorChange}
           options={{
             minimap: { enabled: false },
-            fontSize: 14,
+            fontSize: editorFontSize,
             lineNumbers: 'on',
             scrollBeyondLastLine: false,
             automaticLayout: true,
             padding: { top: 20 },
           }}
         />
-        <button className="absolute bottom-4 right-4 p-2 bg-zinc-800/50 text-zinc-400 rounded hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100 z-10">
-          <Maximize2 size={16} />
+        <button 
+          onClick={() => setIsZenMode(true)}
+          className="absolute bottom-4 right-4 p-2 bg-zinc-800/50 text-zinc-400 rounded hover:bg-zinc-700 transition-colors opacity-0 group-hover:opacity-100 z-10"
+          title="Zen Mode"
+        >
+          <Expand size={16} />
         </button>
       </div>
+
+      {/* Zen Mode Overlay */}
+      {isZenMode && (
+        <div className="fixed inset-0 z-[200] bg-[#0F0F0F] flex flex-col">
+          <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-6 bg-[#141414]">
+            <div className="flex items-center gap-4">
+              <h2 className="text-sm font-bold text-zinc-200">Zen Mode</h2>
+              <div className="h-4 w-px bg-zinc-800"></div>
+              <span className="text-xs text-zinc-500 italic">Press ESC to exit</span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 gap-3">
+                <Type size={14} className="text-zinc-500" />
+                <button onClick={() => setEditorFontSize(prev => Math.max(8, prev - 1))} className="text-zinc-400 hover:text-zinc-200 font-bold">-</button>
+                <span className="text-xs font-bold text-zinc-300 min-w-[24px] text-center">{editorFontSize}</span>
+                <button onClick={() => setEditorFontSize(prev => Math.min(32, prev + 1))} className="text-zinc-400 hover:text-zinc-200 font-bold">+</button>
+              </div>
+
+              <button 
+                onClick={() => setEditorTheme(prev => prev === 'vs-dark' ? 'light' : 'vs-dark')}
+                className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors"
+              >
+                {editorTheme === 'vs-dark' ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+
+              <button 
+                onClick={() => setIsZenMode(false)}
+                className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg transition-colors"
+              >
+                <Minimize2 size={16} />
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex-1">
+            <Editor
+              height="100%"
+              language={language}
+              theme={editorTheme}
+              value={code[language as keyof typeof code]}
+              onChange={handleEditorChange}
+              options={{
+                minimap: { enabled: true },
+                fontSize: editorFontSize + 2,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                padding: { top: 32 },
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Test Cases Area */}
       <div className="h-1/3 border-t border-zinc-800 flex flex-col bg-[#141414]">

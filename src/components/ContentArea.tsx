@@ -5,15 +5,22 @@ import {
   BookOpen, 
   History, 
   MessageSquare, 
-  Play, 
   ChevronLeft, 
   ChevronRight,
   ThumbsUp,
   Share2,
   Flag,
   Maximize2,
+  Minimize2,
   Loader2,
   AlertCircle,
+  CheckCircle2,
+  Sun,
+  Moon,
+  Type,
+  Expand,
+  Clock,
+  Database,
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,8 +33,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 import { cn } from '../lib/utils';
 
 export default function ContentArea() {
-  const [activeTab, setActiveTab] = React.useState('Editorial');
+  const [activeTab, setActiveTab] = React.useState('Description');
   const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [quizAnswer, setQuizAnswer] = React.useState<string | null>(null);
+  const [editorTheme, setEditorTheme] = React.useState('vs-dark');
+  const [editorFontSize, setEditorFontSize] = React.useState(12);
+  const [isZenMode, setIsZenMode] = React.useState(false);
+  const [selectedSubmission, setSelectedSubmission] = React.useState<any | null>(null);
   const [pdfUrl, setPdfUrl] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -141,35 +153,25 @@ export default function ContentArea() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen, numPages]);
 
+  // Handle Zen Mode ESC key
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isZenMode) {
+        setIsZenMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isZenMode]);
+
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
-    setCurrentPage(1);
+    setLoading(false);
   };
 
-  // Handle Fullscreen
   const toggleFullscreen = () => {
-    if (!pdfContainerRef.current) return;
-
-    if (!document.fullscreenElement) {
-      pdfContainerRef.current.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
-    }
+    setIsFullscreen(!isFullscreen);
   };
-
-  // Sync state with native fullscreen changes
-  React.useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
 
   return (
     <div className="w-[45%] flex flex-col h-screen border-r border-zinc-800 bg-[#0F0F0F]">
@@ -177,13 +179,160 @@ export default function ContentArea() {
       <div className="h-12 border-b border-zinc-800 flex items-center px-2 bg-[#141414] shrink-0">
         <Tab icon={<FileText size={14} />} label="Description" active={activeTab === 'Description'} onClick={() => setActiveTab('Description')} />
         <Tab icon={<BookOpen size={14} />} label="Editorial" active={activeTab === 'Editorial'} onClick={() => setActiveTab('Editorial')} />
-        <Tab icon={<History size={14} />} label="Submissions" active={activeTab === 'Submissions'} onClick={() => setActiveTab('Submissions')} />
-        <Tab icon={<MessageSquare size={14} />} label="Discussion" active={activeTab === 'Discussion'} onClick={() => setActiveTab('Discussion')} />
+        <Tab icon={<History size={14} />} label="Submission" active={activeTab === 'Submission'} onClick={() => setActiveTab('Submission')} />
       </div>
 
       {/* Content Scrollable Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         <div className="p-6">
+          {activeTab === 'Description' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl font-bold text-zinc-100">Accessing Outer Class Members</h1>
+              </div>
+              
+              <div className="flex items-center gap-2 mb-6">
+                <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold rounded border border-yellow-500/20">Medium</span>
+                <button className="flex items-center gap-1 px-2 py-0.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-[10px] font-bold rounded border border-zinc-700 transition-colors">
+                  Hints
+                </button>
+              </div>
+
+              <div className="prose prose-invert max-w-none">
+                <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                  In Java, a non-static nested class (also known as an inner class) has a special relationship with its outer class. 
+                  Specifically, it can access all members (fields and methods) of the outer class, including those declared as <code className="text-orange-500 bg-orange-500/10 px-1 rounded">private</code>.
+                </p>
+                
+                <p className="text-zinc-400 text-sm leading-relaxed mb-8">
+                  Given an outer class <code className="text-zinc-300">Outer</code> with a private integer field <code className="text-zinc-300">x</code>, 
+                  implement a method <code className="text-zinc-300">calculate(int factor)</code> inside a non-static inner class <code className="text-zinc-300">Inner</code> 
+                  that returns the product of <code className="text-zinc-300">x</code> and the given <code className="text-zinc-300">factor</code>.
+                </p>
+
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="text-sm font-bold text-zinc-200 mb-3">Example 1</h3>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 space-y-2">
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Input:</span>
+                        <span className="text-zinc-400 font-mono">x = 10, factor = 5</span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Output:</span>
+                        <span className="text-zinc-400 font-mono">50</span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Explanation:</span>
+                        <span className="text-zinc-400">The inner class accesses the private field <code className="text-zinc-500">x</code> (10) and multiplies it by the factor (5). Result: 10 * 5 = 50.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-zinc-200 mb-3">Example 2</h3>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 space-y-2">
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Input:</span>
+                        <span className="text-zinc-400 font-mono">x = -2, factor = 10</span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Output:</span>
+                        <span className="text-zinc-400 font-mono">-20</span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Explanation:</span>
+                        <span className="text-zinc-400">Accessing negative values works exactly the same way. -2 * 10 = -20.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-12 pt-8 border-t border-zinc-800/50">
+                  <h3 className="text-sm font-bold text-zinc-200 mb-4">Now your turn!</h3>
+                  <div className="pl-4 border-l-2 border-zinc-800 space-y-6">
+                    <div className="space-y-1">
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Input:</span>
+                        <span className="text-zinc-400 font-mono">x = 5, factor = -3</span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span className="font-bold text-zinc-300 min-w-[80px]">Output:</span>
+                        <span className="text-orange-500 font-bold">Pick your answer</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-4">
+                      {['-15', '15'].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setQuizAnswer(option)}
+                          className={cn(
+                            "flex items-center gap-3 px-6 py-4 rounded-xl border transition-all duration-300 min-w-[180px] group",
+                            quizAnswer === option 
+                              ? "bg-orange-500/10 border-orange-500/50 text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.1)]" 
+                              : "bg-zinc-900/30 border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+                            quizAnswer === option ? "border-orange-500" : "border-zinc-700 group-hover:border-zinc-500"
+                          )}>
+                            {quizAnswer === option && (
+                              <motion.div 
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-2.5 h-2.5 bg-orange-500 rounded-full" 
+                              />
+                            )}
+                          </div>
+                          <span className="font-bold text-sm tracking-tight">{option}</span>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <AnimatePresence>
+                      {quizAnswer && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className={cn(
+                            "flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
+                            quizAnswer === '-15' ? "text-emerald-500" : "text-red-500"
+                          )}
+                        >
+                          {quizAnswer === '-15' ? (
+                            <>
+                              <CheckCircle2 size={14} />
+                              Correct! 5 * -3 = -15
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle size={14} />
+                              Incorrect. Try again!
+                            </>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-zinc-800/50">
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Constraints</h3>
+                  <ul className="list-disc list-inside text-zinc-500 text-xs space-y-2">
+                    <li>The outer class must contain a private field <code className="text-zinc-600 font-mono">x</code>.</li>
+                    <li>The inner class must be non-static.</li>
+                    <li><code className="text-zinc-600 font-mono">-10^4 &lt;= x, factor &lt;= 10^4</code></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+      {activeTab === 'Editorial' && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-bold text-zinc-100">Nested Classes in Java</h1>
             <div className="flex items-center gap-2">
@@ -399,19 +548,56 @@ export default function ContentArea() {
 
             {/* 3. Solution */}
             <section className="mb-10">
-              <h2 className="text-lg font-bold text-zinc-200 mb-3 flex items-center gap-2">
-                <div className="w-1 h-5 bg-orange-500 rounded-full"></div>
-                Solution Code
-              </h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold text-zinc-200 flex items-center gap-2">
+                  <div className="w-1 h-5 bg-orange-500 rounded-full"></div>
+                  Solution Code
+                </h2>
+                
+                <div className="flex items-center gap-2">
+                  {/* Font Size Controls */}
+                  <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 gap-2">
+                    <Type size={12} className="text-zinc-500" />
+                    <button 
+                      onClick={() => setEditorFontSize(prev => Math.max(8, prev - 1))}
+                      className="text-zinc-400 hover:text-zinc-200 text-xs font-bold px-1"
+                    >-</button>
+                    <span className="text-[10px] font-bold text-zinc-300 min-w-[20px] text-center">{editorFontSize}</span>
+                    <button 
+                      onClick={() => setEditorFontSize(prev => Math.min(32, prev + 1))}
+                      className="text-zinc-400 hover:text-zinc-200 text-xs font-bold px-1"
+                    >+</button>
+                  </div>
+
+                  {/* Theme Toggle */}
+                  <button 
+                    onClick={() => setEditorTheme(prev => prev === 'vs-dark' ? 'light' : 'vs-dark')}
+                    className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors"
+                    title="Toggle Theme"
+                  >
+                    {editorTheme === 'vs-dark' ? <Sun size={14} /> : <Moon size={14} />}
+                  </button>
+
+                  {/* Zen Mode Toggle */}
+                  <button 
+                    onClick={() => setIsZenMode(true)}
+                    className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors"
+                    title="Zen Mode"
+                  >
+                    <Expand size={14} />
+                  </button>
+                </div>
+              </div>
+
               <div className="bg-[#141414] border border-zinc-800 rounded-xl overflow-hidden">
                 <div className="flex border-b border-zinc-800 bg-zinc-900/50">
-                  {['C++', 'Java', 'Python'].map((lang) => (
+                  {['Java'].map((lang) => (
                     <button key={lang} className={cn(
                       "px-6 py-2.5 text-xs font-bold transition-all relative",
-                      lang === 'Java' ? "text-orange-500 bg-zinc-800/50" : "text-zinc-500 hover:text-zinc-300"
+                      "text-orange-500 bg-zinc-800/50"
                     )}>
                       {lang}
-                      {lang === 'Java' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>}
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
                     </button>
                   ))}
                 </div>
@@ -419,7 +605,7 @@ export default function ContentArea() {
                   <Editor
                     height="100%"
                     defaultLanguage="java"
-                    theme="vs-dark"
+                    theme={editorTheme}
                     value={`public class Example1 {
     public static void main(String[] args) {
         Outer1 instance1 = new Outer1();
@@ -429,7 +615,7 @@ export default function ContentArea() {
 }`}
                     options={{
                       minimap: { enabled: false },
-                      fontSize: 12,
+                      fontSize: editorFontSize,
                       lineNumbers: 'on',
                       scrollBeyondLastLine: false,
                       readOnly: true,
@@ -441,7 +627,235 @@ export default function ContentArea() {
             </section>
           </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'Submission' && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+          {!selectedSubmission ? (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-zinc-100">Past Submissions</h2>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                  3 Accepted
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  { id: 1, status: 'Accepted', runtime: '2ms', memory: '42.5MB', date: 'Mar 17, 2026', language: 'Java', runtimePercent: '98.5%', memoryPercent: '82.1%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+                  { id: 2, status: 'Wrong Answer', runtime: 'N/A', memory: 'N/A', date: 'Mar 16, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return 0;\n    }\n}' },
+                  { id: 3, status: 'Accepted', runtime: '3ms', memory: '43.1MB', date: 'Mar 15, 2026', language: 'Java', runtimePercent: '92.3%', memoryPercent: '75.4%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+                  { id: 4, status: 'Time Limit Exceeded', runtime: 'N/A', memory: 'N/A', date: 'Mar 14, 2026', language: 'Java', runtimePercent: '0%', memoryPercent: '0%', code: 'class Solution {\n    public int accessX(Outer o) {\n        while(true);\n    }\n}' },
+                  { id: 5, status: 'Accepted', runtime: '5ms', memory: '44.2MB', date: 'Mar 12, 2026', language: 'Java', runtimePercent: '85.1%', memoryPercent: '68.2%', code: 'class Solution {\n    public int accessX(Outer o) {\n        return o.x;\n    }\n}' },
+                ].map((sub, idx) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    onClick={() => setSelectedSubmission(sub)}
+                    className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 hover:border-zinc-700/50 hover:bg-zinc-900/50 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-2 h-2 rounded-full",
+                          sub.status === 'Accepted' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : 
+                          sub.status === 'Wrong Answer' ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]" : "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]"
+                        )}></div>
+                        <span className={cn(
+                          "text-sm font-bold tracking-tight",
+                          sub.status === 'Accepted' ? "text-emerald-500" : 
+                          sub.status === 'Wrong Answer' ? "text-red-500" : "text-orange-500"
+                        )}>
+                          {sub.status}
+                        </span>
+                        <span className="text-[9px] text-zinc-500 font-black uppercase tracking-[0.2em] px-2 py-0.5 bg-zinc-800/50 rounded-md border border-zinc-700/30">
+                          {sub.language}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-medium text-zinc-600 group-hover:text-zinc-400 transition-colors">{sub.date}</span>
+                    </div>
+
+                    {sub.status === 'Accepted' ? (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-zinc-500 flex items-center gap-1.5">
+                              <Clock size={10} /> Runtime
+                            </span>
+                            <span className="text-emerald-500 font-bold">{sub.runtimePercent}</span>
+                          </div>
+                          <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500/50 w-[98%]"></div>
+                          </div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{sub.runtime}</div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-zinc-500 flex items-center gap-1.5">
+                              <Database size={10} /> Memory
+                            </span>
+                            <span className="text-emerald-500 font-bold">{sub.memoryPercent}</span>
+                          </div>
+                          <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500/50 w-[82%]"></div>
+                          </div>
+                          <div className="text-[10px] text-zinc-400 font-mono">{sub.memory}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-[10px] text-zinc-500 italic">
+                        <AlertCircle size={10} />
+                        {sub.status === 'Wrong Answer' ? 'Failed at test case 42/150' : 'Execution timed out after 2000ms'}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+              <button 
+                onClick={() => setSelectedSubmission(null)}
+                className="flex items-center gap-2 text-zinc-500 hover:text-zinc-200 text-xs font-bold mb-6 transition-colors group"
+              >
+                <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                Back to Submissions
+              </button>
+
+              <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 mb-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                      selectedSubmission.status === 'Accepted' ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : 
+                      selectedSubmission.status === 'Wrong Answer' ? "bg-red-500/10 text-red-500 border border-red-500/20" : "bg-orange-500/10 text-orange-500 border border-orange-500/20"
+                    )}>
+                      {selectedSubmission.status}
+                    </div>
+                    <span className="text-xs text-zinc-500">{selectedSubmission.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase">Language:</span>
+                    <span className="text-xs font-bold text-zinc-300">{selectedSubmission.language}</span>
+                  </div>
+                </div>
+
+                {selectedSubmission.status === 'Accepted' && (
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 text-zinc-500 text-[10px] uppercase tracking-widest mb-2">
+                        <Clock size={12} /> Runtime
+                      </div>
+                      <div className="text-2xl font-bold text-emerald-500 mb-1">{selectedSubmission.runtime}</div>
+                      <div className="text-[10px] text-zinc-500">Beats <span className="text-zinc-300 font-bold">{selectedSubmission.runtimePercent}</span> of users</div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 text-zinc-500 text-[10px] uppercase tracking-widest mb-2">
+                        <Database size={12} /> Memory
+                      </div>
+                      <div className="text-2xl font-bold text-emerald-500 mb-1">{selectedSubmission.memory}</div>
+                      <div className="text-[10px] text-zinc-500">Beats <span className="text-zinc-300 font-bold">{selectedSubmission.memoryPercent}</span> of users</div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Submitted Code</h3>
+                  <div className="bg-[#141414] border border-zinc-800 rounded-xl overflow-hidden">
+                    <div className="p-0 h-[300px]">
+                      <Editor
+                        height="100%"
+                        defaultLanguage="java"
+                        theme={editorTheme}
+                        value={selectedSubmission.code}
+                        options={{
+                          minimap: { enabled: false },
+                          fontSize: editorFontSize,
+                          lineNumbers: 'on',
+                          scrollBeyondLastLine: false,
+                          readOnly: true,
+                          padding: { top: 16 },
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Zen Mode Overlay */}
+      <AnimatePresence>
+        {isZenMode && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-[#0F0F0F] flex flex-col"
+          >
+            <div className="h-14 border-b border-zinc-800 flex items-center justify-between px-6 bg-[#141414]">
+              <div className="flex items-center gap-4">
+                <h2 className="text-sm font-bold text-zinc-200">Zen Mode</h2>
+                <div className="h-4 w-px bg-zinc-800"></div>
+                <span className="text-xs text-zinc-500 italic">Press ESC to exit</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 gap-3">
+                  <Type size={14} className="text-zinc-500" />
+                  <button onClick={() => setEditorFontSize(prev => Math.max(8, prev - 1))} className="text-zinc-400 hover:text-zinc-200 font-bold">-</button>
+                  <span className="text-xs font-bold text-zinc-300 min-w-[24px] text-center">{editorFontSize}</span>
+                  <button onClick={() => setEditorFontSize(prev => Math.min(32, prev + 1))} className="text-zinc-400 hover:text-zinc-200 font-bold">+</button>
+                </div>
+
+                <button 
+                  onClick={() => setEditorTheme(prev => prev === 'vs-dark' ? 'light' : 'vs-dark')}
+                  className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors"
+                >
+                  {editorTheme === 'vs-dark' ? <Sun size={16} /> : <Moon size={16} />}
+                </button>
+
+                <button 
+                  onClick={() => setIsZenMode(false)}
+                  className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg transition-colors"
+                >
+                  <Minimize2 size={16} />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <Editor
+                height="100%"
+                defaultLanguage="java"
+                theme={editorTheme}
+                value={`public class Example1 {
+    public static void main(String[] args) {
+        Outer1 instance1 = new Outer1();
+        Outer1.Inner1 instance2 = instance1.new Inner1();
+        instance2.method3();
+    }
+}`}
+                options={{
+                  minimap: { enabled: true },
+                  fontSize: editorFontSize + 2,
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  readOnly: true,
+                  padding: { top: 32 },
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  </div>
 
 
       {/* Footer Actions */}
@@ -475,13 +889,19 @@ function Tab({ icon, label, active, onClick }: { icon: React.ReactNode; label: s
     <button 
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 px-4 py-2 text-xs font-medium transition-colors relative",
+        "flex items-center gap-2 px-4 py-2 text-xs font-medium transition-colors relative h-full",
         active ? "text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
       )}
     >
       {icon}
       {label}
-      {active && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>}
+      {active && (
+        <motion.div 
+          layoutId="activeTab"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        />
+      )}
     </button>
   );
 }
