@@ -146,6 +146,12 @@ export default function ContentArea() {
         setCurrentPage(prev => Math.min(prev + 1, numPages || prev));
       } else if (e.key === 'ArrowLeft') {
         setCurrentPage(prev => Math.max(prev - 1, 1));
+      } else if (e.key === 'Escape') {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          setIsFullscreen(false);
+        }
       }
     };
 
