@@ -172,6 +172,7 @@ export default function ContentArea() {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setCurrentPage(1);
     setLoading(false);
   };
 
@@ -427,8 +428,8 @@ export default function ContentArea() {
                       <span className={cn("font-bold text-zinc-400", isFullscreen ? "text-sm" : "text-xs")}>{numPages}</span>
                     </div>
                     <button 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, numPages))}
-                      disabled={currentPage === numPages}
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, numPages || prev))}
+                      disabled={!numPages || currentPage === numPages}
                       className="p-2 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
                       <ChevronRight size={isFullscreen ? 24 : 18} />
@@ -513,7 +514,7 @@ export default function ContentArea() {
                     <div className="w-32 h-1 bg-zinc-800 rounded-full overflow-hidden relative">
                       <motion.div 
                         initial={{ width: 0 }}
-                        animate={{ width: `${(currentPage / numPages) * 100}%` }}
+                        animate={{ width: numPages ? `${(currentPage / numPages) * 100}%` : 0 }}
                         transition={{ type: "spring", stiffness: 100, damping: 20 }}
                         className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.4)]"
                       />
@@ -538,7 +539,7 @@ export default function ContentArea() {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest min-w-[32px] text-right"
                       >
-                        {Math.round((currentPage / numPages) * 100)}%
+                        {numPages ? Math.round((currentPage / numPages) * 100) : 0}%
                       </motion.span>
                     </AnimatePresence>
                   </div>
