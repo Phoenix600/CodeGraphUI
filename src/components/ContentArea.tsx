@@ -70,33 +70,38 @@ export default function ContentArea() {
   const DIRECT_DOWNLOAD_URL = `https://drive.usercontent.google.com/u/0/uc?id=${GOOGLE_DRIVE_ID}&export=download`;
   const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(DIRECT_DOWNLOAD_URL)}`;
 
-  // Suppress ResizeObserver loop limit exceeded error
-  React.useEffect(() => {
-    const handleError = (e: ErrorEvent) => {
-      if (e.message === 'ResizeObserver loop completed with undelivered notifications.' ||
-          e.message === 'ResizeObserver loop limit exceeded') {
-        e.stopImmediatePropagation();
-      }
-    };
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
-  }, []);
+  const lastWidthRef = React.useRef<number>(0);
+  const resizeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Handle Container Resize
   React.useEffect(() => {
     if (!pdfContainerRef.current) return;
 
     const observer = new ResizeObserver((entries) => {
-      window.requestAnimationFrame(() => {
-        if (!entries || entries.length === 0) return;
-        for (const entry of entries) {
-          setContainerWidth(entry.contentRect.width);
-        }
-      });
+      if (!entries || entries.length === 0) return;
+      
+      // Use the parent's width to be more stable
+      const parentWidth = entries[0].contentRect.width;
+      if (Math.abs(parentWidth - lastWidthRef.current) < 1) return;
+
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+
+      resizeTimeoutRef.current = setTimeout(() => {
+        lastWidthRef.current = parentWidth;
+        setContainerWidth(parentWidth);
+        resizeTimeoutRef.current = null;
+      }, 50);
     });
 
-    observer.observe(pdfContainerRef.current);
-    return () => observer.disconnect();
+    observer.observe(pdfContainerRef.current.parentElement || pdfContainerRef.current);
+    return () => {
+      observer.disconnect();
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
   }, [activeTab]);
 
   // Fetch and Cache PDF

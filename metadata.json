@@ -1,5 +1,5 @@
 {
-  "name": "Code Graph",
-  "description": "A modern coding learning platform with interactive chapters, editorial content, and a built-in code editor.",
+  "name": "CodeGraph: Interactive Coding Platform",
+  "description": "A structured coding learning platform designed for future API integration, featuring chapters, problem lists, and detailed problem views.",
   "requestFramePermissions": []
 }
