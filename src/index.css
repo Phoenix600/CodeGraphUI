@@ -1,35 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-serif: "Playfair Display", serif;
+/* PDF Viewer Styles */
+.react-pdf__Page {
+  margin: 0 auto;
 }
 
-:root {
-  --bg: #0A0A0A;
-  --ink: #FFFFFF;
-  --line: #27272A;
+.react-pdf__Document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-body {
-  background-color: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-sans);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+canvas {
+  max-width: 100%;
+  height: auto !important;
 }

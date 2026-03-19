@@ -1,27 +1,48 @@
-export interface Chapter {
+export interface Project {
   id: string;
   title: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  isOngoing?: boolean;
   description: string;
-  problemCount: number;
 }
 
-export interface Problem {
+export interface WorkExperience {
   id: string;
-  chapterId: string;
-  title: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  status: 'Solved' | 'Unsolved' | 'Attempted';
-}
-
-export interface ProblemDetail extends Problem {
+  company: string;
+  mode: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  isOngoing?: boolean;
   description: string;
-  examples: Example[];
-  constraints: string[];
-  hints: string[];
 }
 
-export interface Example {
-  input: string;
-  output: string;
-  explanation?: string;
+export interface UserProfile {
+  name: string;
+  username: string;
+  email: string;
+  location: string;
+  avatarUrl: string;
+  bio: string;
+  skills: {
+    languages: string;
+    frameworks: string;
+    databases: string;
+    tools: string;
+  };
+  education: {
+    university: string;
+    degree: string;
+    currentRole: string;
+  };
+  social: {
+    github: string;
+    linkedin: string;
+    twitter: string;
+  };
+  workExperience: WorkExperience[];
+  projects: Project[];
+  streak: number;
 }

@@ -150,37 +150,6 @@ if __name__ == "__main__":
     }
   };
 
-  const [editor, setEditor] = React.useState<any>(null);
-  const editorContainerRef = React.useRef<HTMLDivElement>(null);
-  const resizeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Handle Monaco Resize
-  React.useEffect(() => {
-    if (!editor || !editorContainerRef.current) return;
-
-    const observer = new ResizeObserver(() => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      resizeTimeoutRef.current = setTimeout(() => {
-        editor.layout();
-        resizeTimeoutRef.current = null;
-      }, 50);
-    });
-
-    observer.observe(editorContainerRef.current);
-    return () => {
-      observer.disconnect();
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, [editor]);
-
-  const handleEditorDidMount = (editor: any) => {
-    setEditor(editor);
-  };
-
   // Handle Zen Mode ESC key
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -235,20 +204,19 @@ if __name__ == "__main__":
       </div>
 
       {/* Code Editor */}
-      <div ref={editorContainerRef} className="flex-1 overflow-hidden relative group">
+      <div className="flex-1 overflow-hidden relative group">
         <Editor
           height="100%"
           language={language}
           theme={editorTheme}
           value={code[language as keyof typeof code]}
           onChange={handleEditorChange}
-          onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: false },
             fontSize: editorFontSize,
             lineNumbers: 'on',
             scrollBeyondLastLine: false,
-            automaticLayout: false,
+            automaticLayout: true,
             padding: { top: 20 },
           }}
         />
@@ -307,7 +275,7 @@ if __name__ == "__main__":
                 fontSize: editorFontSize + 2,
                 lineNumbers: 'on',
                 scrollBeyondLastLine: false,
-                automaticLayout: false,
+                automaticLayout: true,
                 padding: { top: 32 },
               }}
             />
