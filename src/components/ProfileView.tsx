@@ -98,15 +98,24 @@ const CheckboxField = ({ label, checked, onChange }: { label: string, checked: b
   </label>
 );
 
-const SelectField = ({ label, placeholder, value, required }: { label: string, placeholder: string, value?: string, required?: boolean }) => (
+const SelectField = ({ label, placeholder, value, onChange, options, required }: { label: string, placeholder: string, value?: string, onChange?: (val: string) => void, options?: string[], required?: boolean }) => (
   <div className="space-y-1.5 flex-1 min-w-[240px]">
     <label className="text-xs font-medium text-zinc-500">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
-    <button className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-400 flex items-center justify-between hover:border-zinc-700 transition-colors">
-      <span className={cn("truncate", value && "text-zinc-200")}>{value || placeholder}</span>
-      <ChevronDown size={14} className="text-zinc-600" />
-    </button>
+    <div className="relative group">
+      <select 
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        className="w-full bg-zinc-900/50 border border-zinc-800 rounded-md py-2 px-3 text-sm text-zinc-200 focus:outline-none focus:border-orange-500/50 transition-colors appearance-none cursor-pointer"
+      >
+        <option value="" disabled>{placeholder}</option>
+        {options?.map(opt => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+    </div>
   </div>
 );
 
@@ -130,7 +139,10 @@ const Section = ({ title, children, onSave }: { title: string, children: React.R
       {children}
       {onSave && (
         <div className="flex justify-end">
-          <button className="bg-orange-600/10 hover:bg-orange-600/20 text-orange-500 text-xs font-bold py-2 px-6 rounded-md border border-orange-500/20 transition-all">
+          <button 
+            onClick={onSave}
+            className="bg-orange-600/10 hover:bg-orange-600/20 text-orange-500 text-xs font-bold py-2 px-6 rounded-md border border-orange-500/20 transition-all"
+          >
             Save Changes
           </button>
         </div>
@@ -182,6 +194,16 @@ export default function ProfileView({ user, onSave, onBack }: ProfileViewProps) 
   const [workExperiences, setWorkExperiences] = React.useState<WorkExperience[]>(user.workExperience);
   const [projects, setProjects] = React.useState<Project[]>(user.projects);
   const [showToast, setShowToast] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onBack();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack]);
 
   const handleSave = () => {
     const updatedUser: UserProfile = {
@@ -348,7 +370,11 @@ export default function ProfileView({ user, onSave, onBack }: ProfileViewProps) 
                   />
                   <div className="flex gap-4 flex-1">
                     <div className="w-24">
-                      <SelectField label="Mobile Number" placeholder="Select" />
+                      <SelectField 
+                        label="Mobile Number" 
+                        placeholder="Select" 
+                        options={["+91", "+1", "+44", "+81"]}
+                      />
                     </div>
                     <div className="flex-1 pt-6">
                       <input 
@@ -363,8 +389,18 @@ export default function ProfileView({ user, onSave, onBack }: ProfileViewProps) 
                     value={profileData.location} 
                     onChange={(val) => setProfileData({ ...profileData, location: val })}
                   />
-                  <SelectField label="Education year" placeholder="Choose Your Graduation Year" />
-                  <SelectField label="Education" placeholder={profileData.education.university} />
+                  <SelectField 
+                    label="Education year" 
+                    placeholder="Choose Your Graduation Year" 
+                    options={["2024", "2025", "2026", "2027"]}
+                  />
+                  <SelectField 
+                    label="Education" 
+                    placeholder="Select University" 
+                    value={profileData.education.university}
+                    options={["University of Mumbai", "IIT Bombay", "BITS Pilani", "VIT Vellore"]}
+                    onChange={(val) => setProfileData({ ...profileData, education: { ...profileData.education, university: val } })}
+                  />
                 </div>
               </Section>
 
@@ -442,10 +478,34 @@ export default function ProfileView({ user, onSave, onBack }: ProfileViewProps) 
               {/* Coding Profile Section */}
               <Section title="Coding Profile" onSave={handleSave}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputField label="Leetcode" placeholder="Add your Leetcode profile URL" icon={Code2} />
-                  <InputField label="Hackerrank" placeholder="Add your Hackerrank profile URL" icon={Code2} />
-                  <InputField label="Codeforces" placeholder="Add your Codeforces profile URL" icon={Code2} />
-                  <InputField label="GeeksForGeeks" placeholder="Add your GeeksForGeeks profile URL" icon={Code2} />
+                  <InputField 
+                    label="Leetcode" 
+                    placeholder="Add your Leetcode profile URL" 
+                    icon={Code2} 
+                    value={profileData.codingProfiles.leetcode}
+                    onChange={(val) => setProfileData({ ...profileData, codingProfiles: { ...profileData.codingProfiles, leetcode: val } })}
+                  />
+                  <InputField 
+                    label="Hackerrank" 
+                    placeholder="Add your Hackerrank profile URL" 
+                    icon={Code2} 
+                    value={profileData.codingProfiles.hackerrank}
+                    onChange={(val) => setProfileData({ ...profileData, codingProfiles: { ...profileData.codingProfiles, hackerrank: val } })}
+                  />
+                  <InputField 
+                    label="Codeforces" 
+                    placeholder="Add your Codeforces profile URL" 
+                    icon={Code2} 
+                    value={profileData.codingProfiles.codeforces}
+                    onChange={(val) => setProfileData({ ...profileData, codingProfiles: { ...profileData.codingProfiles, codeforces: val } })}
+                  />
+                  <InputField 
+                    label="GeeksForGeeks" 
+                    placeholder="Add your GeeksForGeeks profile URL" 
+                    icon={Code2} 
+                    value={profileData.codingProfiles.geeksforgeeks}
+                    onChange={(val) => setProfileData({ ...profileData, codingProfiles: { ...profileData.codingProfiles, geeksforgeeks: val } })}
+                  />
                   <InputField label="Others" placeholder="Add your other contest profile URL" icon={Code2} />
                 </div>
               </Section>

@@ -263,6 +263,16 @@ const ProfileDetails = ({ user }: { user: UserProfile }) => {
 };
 
 export default function ProfileDashboard({ user, onBack, onEdit }: ProfileDashboardProps) {
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onBack();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack]);
+
   return (
     <div className="flex h-screen bg-[#0A0A0A] text-zinc-300 font-sans overflow-hidden">
       {/* Sidebar */}

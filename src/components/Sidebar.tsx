@@ -154,15 +154,69 @@ export default function Sidebar({ isVisible, onToggle, onProfileClick }: Sidebar
             { label: 'Quick Sorting', completed: false },
           ]}
         />
-        <SidebarItem label="Arrays" onItemClick={onToggle} />
-        <SidebarItem label="Hashing" onItemClick={onToggle} />
-        <SidebarItem label="Binary Search" onItemClick={onToggle} />
-        <SidebarItem label="Recursion" onItemClick={onToggle} />
-        <SidebarItem label="Linked-List" onItemClick={onToggle} />
-        <SidebarItem label="Bit Manipulation" onItemClick={onToggle} />
-        <SidebarItem label="Greedy Algorithms" onItemClick={onToggle} />
-        <SidebarItem label="Sliding Window" onItemClick={onToggle} />
-        <SidebarItem label="Stack / Queues" onItemClick={onToggle} />
+        <SidebarItem 
+          label="Arrays" 
+          isOpen={openSections['Arrays']}
+          onToggle={() => toggleSection('Arrays')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Two Sum', completed: false }]}
+        />
+        <SidebarItem 
+          label="Hashing" 
+          isOpen={openSections['Hashing']}
+          onToggle={() => toggleSection('Hashing')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Contains Duplicate', completed: false }]}
+        />
+        <SidebarItem 
+          label="Binary Search" 
+          isOpen={openSections['Binary Search']}
+          onToggle={() => toggleSection('Binary Search')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Binary Search', completed: false }]}
+        />
+        <SidebarItem 
+          label="Recursion" 
+          isOpen={openSections['Recursion']}
+          onToggle={() => toggleSection('Recursion')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Fibonacci Number', completed: false }]}
+        />
+        <SidebarItem 
+          label="Linked-List" 
+          isOpen={openSections['Linked-List']}
+          onToggle={() => toggleSection('Linked-List')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Reverse Linked List', completed: false }]}
+        />
+        <SidebarItem 
+          label="Bit Manipulation" 
+          isOpen={openSections['Bit Manipulation']}
+          onToggle={() => toggleSection('Bit Manipulation')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Number of 1 Bits', completed: false }]}
+        />
+        <SidebarItem 
+          label="Greedy Algorithms" 
+          isOpen={openSections['Greedy Algorithms']}
+          onToggle={() => toggleSection('Greedy Algorithms')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Assign Cookies', completed: false }]}
+        />
+        <SidebarItem 
+          label="Sliding Window" 
+          isOpen={openSections['Sliding Window']}
+          onToggle={() => toggleSection('Sliding Window')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Longest Substring Without Repeating Characters', completed: false }]}
+        />
+        <SidebarItem 
+          label="Stack / Queues" 
+          isOpen={openSections['Stack / Queues']}
+          onToggle={() => toggleSection('Stack / Queues')}
+          onItemClick={onToggle}
+          subItems={[{ label: 'Valid Parentheses', completed: false }]}
+        />
       </div>
 
       <div className="p-4 border-t border-zinc-800 space-y-2">

@@ -23,6 +23,12 @@ export const DUMMY_USER: UserProfile = {
     linkedin: "linkedin.com/in/rohansatam",
     twitter: "twitter.com/rohansatam",
   },
+  codingProfiles: {
+    leetcode: "leetcode.com/rohansatam",
+    hackerrank: "hackerrank.com/rohansatam",
+    codeforces: "codeforces.com/profile/rohansatam",
+    geeksforgeeks: "geeksforgeeks.org/user/rohansatam",
+  },
   workExperience: [
     {
       id: "1",

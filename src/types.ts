@@ -42,6 +42,12 @@ export interface UserProfile {
     linkedin: string;
     twitter: string;
   };
+  codingProfiles: {
+    leetcode: string;
+    hackerrank: string;
+    codeforces: string;
+    geeksforgeeks: string;
+  };
   workExperience: WorkExperience[];
   projects: Project[];
   streak: number;
